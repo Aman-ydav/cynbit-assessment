@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { useLocation } from "react-router";
+import { trackPageView } from "@/lib/analytics";
 
 /**
  * Single-page apps don't scroll or move focus on navigation by default.
@@ -10,11 +11,14 @@ import { useLocation } from "react-router";
 export function ScrollManager() {
   const { pathname, hash } = useLocation();
   const previousPath = useRef(pathname);
+  const firstLoad = useRef(true);
 
   useEffect(() => {
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const pathChanged = previousPath.current !== pathname;
     previousPath.current = pathname;
+    if (pathChanged || firstLoad.current) trackPageView(pathname);
+    firstLoad.current = false;
 
     if (hash) {
       const target = document.getElementById(decodeURIComponent(hash.slice(1)));
