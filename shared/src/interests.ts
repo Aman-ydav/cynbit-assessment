@@ -155,7 +155,7 @@ export const INTERESTS: Record<InterestId, Interest> = {
     group: "infra",
     blurb: "Securing software and systems",
     coverage: { python_backend: 0.3 },
-    note: "The Python Backend Lab's final phase includes a security audit, but there is no dedicated cybersecurity lab yet.",
+    note: "Its final phase includes a security audit, which touches the basics.",
   },
   blockchain: {
     id: "blockchain",

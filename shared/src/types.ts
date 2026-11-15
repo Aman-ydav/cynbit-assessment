@@ -29,12 +29,15 @@ export interface SkillGap {
 }
 
 export interface Readiness {
-  /** 0–100: share of the lab's weighted prerequisites the learner already has. */
+  /** 0–100: share of the lab's *core* prerequisites the learner already has. */
   score: number;
   band: ReadinessBand;
   headline: string;
   owned: { skill: SkillId; label: string }[];
+  /** Missing core skills — these drive the prep estimate. */
   gaps: SkillGap[];
+  /** Missing skills that are helpful but not required to start. */
+  optionalGaps: SkillGap[];
 }
 
 export type PaceStatus = "tight" | "on_track" | "ahead";
