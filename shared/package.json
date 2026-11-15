@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "sideEffects": false,
   "description": "Framework-agnostic path engine, schemas and codec shared by the Express API and the React client.",
   "exports": {
     ".": "./src/index.ts"

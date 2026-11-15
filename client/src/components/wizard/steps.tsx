@@ -18,7 +18,7 @@ import {
 import { X } from "lucide-react";
 import type { ReactNode } from "react";
 import { OptionCard } from "@/components/wizard/OptionCard";
-import type { Draft } from "@/components/wizard/useWizard";
+import type { Draft } from "@/components/wizard/draft";
 import { Button } from "@/components/ui/button";
 
 interface StepProps {

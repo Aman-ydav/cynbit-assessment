@@ -7,11 +7,10 @@ import {
   type Plan as PlanData,
 } from "@bitelevate/shared";
 import { ArrowRight, MessageCircleQuestion, Undo2 } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { Suspense, lazy, useEffect, useMemo, useState } from "react";
 import { Link, useLocation, useParams } from "react-router";
 import { AnswersRecap } from "@/components/plan/AnswersRecap";
 import { EnrolCard } from "@/components/plan/EnrolCard";
-import { LeadDialog } from "@/components/plan/LeadDialog";
 import {
   AlternatesCard,
   GoodToKnowCard,
@@ -29,6 +28,12 @@ import { api } from "@/lib/api";
 import { track } from "@/lib/analytics";
 import { LAB_ICON, LAB_TINT } from "@/lib/lab-visuals";
 import { cn } from "@/lib/utils";
+
+// The advisor form pulls in react-hook-form and zod. Most visitors never open it, so it loads on
+// demand — and is prefetched when the browser is idle or the button is touched, so it still opens
+// instantly.
+const loadLeadDialog = () => import("@/components/plan/LeadDialog");
+const LeadDialog = lazy(() => loadLeadDialog().then((m) => ({ default: m.LeadDialog })));
 
 /**
  * Prefer the plan the server just generated (passed through router state); otherwise rebuild it
@@ -70,6 +75,14 @@ export default function Plan() {
   const [emailEnabled, setEmailEnabled] = useState(false);
 
   usePageTitle(plan ? `${LABS[plan.primary.labId].name} plan` : "Plan link not valid");
+
+  useEffect(() => {
+    const idle = (window as { requestIdleCallback?: (cb: () => void) => number }).requestIdleCallback;
+    const handle = idle ? idle(() => void loadLeadDialog()) : window.setTimeout(() => void loadLeadDialog(), 2500);
+    return () => {
+      if (!idle) window.clearTimeout(handle);
+    };
+  }, []);
 
   useEffect(() => {
     api
@@ -140,6 +153,8 @@ export default function Plan() {
                   variant="outline"
                   className="bg-card no-print"
                   onClick={() => setLeadOpen(true)}
+                  onPointerEnter={() => void loadLeadDialog()}
+                  onFocus={() => void loadLeadDialog()}
                 >
                   <MessageCircleQuestion /> Talk to an advisor
                 </Button>
@@ -179,7 +194,11 @@ export default function Plan() {
       </div>
 
       <StickyEnrol plan={plan} />
-      <LeadDialog open={leadOpen} onOpenChange={setLeadOpen} planCode={code} emailEnabled={emailEnabled} />
+      {leadOpen && (
+        <Suspense fallback={null}>
+          <LeadDialog open onOpenChange={setLeadOpen} planCode={code} emailEnabled={emailEnabled} />
+        </Suspense>
+      )}
     </>
   );
 }

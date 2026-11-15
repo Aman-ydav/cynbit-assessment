@@ -2,6 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import express, { type Express, type Request } from "express";
 import { log } from "./logger";
+import { createPreloader } from "./preload";
 import { injectMeta, metaForPath } from "./seo";
 
 /**
@@ -34,6 +35,7 @@ export function serveClient(
   );
 
   const indexHtml = fs.readFileSync(indexPath, "utf8");
+  const preloader = createPreloader(distDir, indexHtml);
 
   app.use((req, res, next) => {
     if (req.method !== "GET" && req.method !== "HEAD") return next();
@@ -44,7 +46,7 @@ export function serveClient(
     const meta = metaForPath(req.path);
     res.setHeader("Cache-Control", "no-cache");
     if (meta.noindex) res.setHeader("X-Robots-Tag", "noindex, nofollow");
-    res.status(meta.status).type("html").send(injectMeta(indexHtml, originOf(req), meta));
+    res.status(meta.status).type("html").send(injectMeta(indexHtml, originOf(req), meta, preloader.headFor(req.path)));
   });
 
   return true;

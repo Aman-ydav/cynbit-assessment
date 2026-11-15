@@ -13,13 +13,8 @@ import {
   StepSkills,
   StepTime,
 } from "@/components/wizard/steps";
-import {
-  STEPS,
-  STEP_COUNT,
-  clearSaved,
-  toAnswers,
-  useWizard,
-} from "@/components/wizard/useWizard";
+import { STEPS, STEP_COUNT, clearSaved, toAnswers } from "@/components/wizard/draft";
+import { useWizard } from "@/components/wizard/useWizard";
 import { usePageTitle } from "@/hooks/usePageTitle";
 import { ApiError, api } from "@/lib/api";
 import { getSessionId, track } from "@/lib/analytics";

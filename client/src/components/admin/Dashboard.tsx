@@ -21,7 +21,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { STEPS } from "@/components/wizard/useWizard";
+import { STEPS } from "@/components/wizard/draft";
 import { ApiError, api } from "@/lib/api";
 
 const dateTime = new Intl.DateTimeFormat("en-IN", {

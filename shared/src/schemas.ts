@@ -3,6 +3,17 @@ import { INTEREST_IDS, MAX_INTERESTS } from "./interests";
 import { DAILY_HOURS, EXPERIENCE_LEVELS, GOALS, STAGES } from "./options";
 import { SKILL_IDS } from "./skills";
 
+/*
+ * Zod v4 JIT-compiles parsers with `new Function`, which a strict Content-Security-Policy
+ * (rightly) forbids: the browser blocks it and logs a violation. These schemas are tiny, so the
+ * JIT gains nothing; turning it off keeps the CSP strict and the console clean everywhere.
+ *
+ * It is set here, in the same module and before any schema is created, so the ordering is
+ * guaranteed by construction. (A separate config module relied on import order, which bundlers
+ * are free to change across a side-effect-free barrel.)
+ */
+z.config({ jitless: true });
+
 const isUnique = <T>(items: readonly T[]) => new Set(items).size === items.length;
 
 /** The learner's answers. Validated identically on the client and the server. */

@@ -41,7 +41,7 @@ export function SamplePlanCard({ className }: { className?: string }) {
           </span>
           <div className="min-w-0 flex-1">
             <p className="text-muted-foreground text-sm font-semibold">Best-fit lab</p>
-            <h3 className="mt-0.5 text-xl leading-tight font-extrabold sm:text-2xl">{lab.name}</h3>
+            <p className="font-heading mt-0.5 text-xl leading-tight font-extrabold sm:text-2xl">{lab.name}</p>
             <p className="text-muted-foreground mt-1 text-sm">
               {lab.project} · {lab.tagline}
             </p>

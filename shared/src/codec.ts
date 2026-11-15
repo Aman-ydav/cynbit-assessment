@@ -1,7 +1,8 @@
+import { CODEC_VERSION } from "./encode";
 import { generatePlan } from "./engine";
 import { INTEREST_IDS, MAX_INTERESTS } from "./interests";
 import { DAILY_HOURS, EXPERIENCE_LEVELS, GOALS, STAGES } from "./options";
-import { answersSchema, type Answers } from "./schemas";
+import type { Answers } from "./schemas";
 import { SKILL_IDS } from "./skills";
 import type { Plan } from "./types";
 
@@ -11,12 +12,12 @@ import type { Plan } from "./types";
  * A plan is a pure function of the learner's answers, so a share link only needs to carry the
  * answers — no database lookup, no personal data, and links keep working even if storage is down.
  * Answers are packed as a tuple of enum indices, JSON-encoded and base64url-encoded (~40 chars).
+ *
+ * Encoding lives in encode.ts (no validation dependency); this module adds the strict decoder.
  */
-const CODEC_VERSION = 1;
-const MAX_CODE_LENGTH = 200;
+export { encodeAnswers } from "./encode";
 
-const toBase64Url = (text: string) =>
-  btoa(text).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+const MAX_CODE_LENGTH = 200;
 
 const fromBase64Url = (code: string) => {
   const base64 = code.replace(/-/g, "+").replace(/_/g, "/");
@@ -31,19 +32,8 @@ function lookup<T>(list: readonly T[], index: unknown): T | undefined {
   return typeof index === "number" && Number.isInteger(index) ? list[index] : undefined;
 }
 
-export function encodeAnswers(answers: Answers): string {
-  const tuple = [
-    CODEC_VERSION,
-    STAGES.indexOf(answers.stage),
-    EXPERIENCE_LEVELS.indexOf(answers.experience),
-    GOALS.indexOf(answers.goal),
-    answers.interests.map((id) => INTEREST_IDS.indexOf(id)),
-    DAILY_HOURS.indexOf(answers.hoursPerDay),
-    answers.examsSoon ? 1 : 0,
-    answers.skills.map((id) => SKILL_IDS.indexOf(id)),
-  ];
-  return toBase64Url(JSON.stringify(tuple));
-}
+const isAllDefined = <T>(items: (T | undefined)[]): items is T[] => items.every((item) => item !== undefined);
+const isUnique = <T>(items: readonly T[]) => new Set(items).size === items.length;
 
 /** Returns the answers for a valid code, or `null` for anything malformed or tampered with. */
 export function decodeAnswers(code: string): Answers | null {
@@ -53,22 +43,25 @@ export function decodeAnswers(code: string): Answers | null {
     const tuple: unknown = JSON.parse(fromBase64Url(code));
     if (!Array.isArray(tuple) || tuple.length !== 8 || tuple[0] !== CODEC_VERSION) return null;
 
-    const [, stage, experience, goal, interests, hours, exams, skills] = tuple;
-    if (!Array.isArray(interests) || !Array.isArray(skills)) return null;
-    if (interests.length > MAX_INTERESTS || skills.length > SKILL_IDS.length) return null;
+    const [, stageIdx, experienceIdx, goalIdx, interestIdx, hoursIdx, exams, skillIdx] = tuple;
+    if (!Array.isArray(interestIdx) || !Array.isArray(skillIdx)) return null;
+    if (interestIdx.length > MAX_INTERESTS || skillIdx.length > SKILL_IDS.length) return null;
     if (exams !== 0 && exams !== 1) return null;
 
-    // Lookups yield `undefined` for bad indices, which the schema then rejects.
-    const parsed = answersSchema.safeParse({
-      stage: lookup(STAGES, stage),
-      experience: lookup(EXPERIENCE_LEVELS, experience),
-      goal: lookup(GOALS, goal),
-      interests: interests.map((index) => lookup(INTEREST_IDS, index)),
-      hoursPerDay: lookup(DAILY_HOURS, hours),
-      examsSoon: exams === 1,
-      skills: skills.map((index) => lookup(SKILL_IDS, index)),
-    });
-    return parsed.success ? parsed.data : null;
+    // Validated by hand (rather than with the zod schema) so that opening a shared plan doesn't
+    // download a validation library. A fuzz test asserts this accepts only what answersSchema accepts.
+    const stage = lookup(STAGES, stageIdx);
+    const experience = lookup(EXPERIENCE_LEVELS, experienceIdx);
+    const goal = lookup(GOALS, goalIdx);
+    const hoursPerDay = lookup(DAILY_HOURS, hoursIdx);
+    const interests = interestIdx.map((index) => lookup(INTEREST_IDS, index));
+    const skills = skillIdx.map((index) => lookup(SKILL_IDS, index));
+
+    if (!stage || !experience || !goal || !hoursPerDay) return null;
+    if (!isAllDefined(interests) || !isAllDefined(skills)) return null;
+    if (!isUnique(interests) || !isUnique(skills)) return null;
+
+    return { stage, experience, goal, interests, hoursPerDay, examsSoon: exams === 1, skills };
   } catch {
     return null;
   }

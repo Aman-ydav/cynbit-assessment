@@ -105,10 +105,12 @@
   --animate-rise: rise 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
   --animate-fade: fade 0.35s ease-out both;
 
+  /* Starts slightly visible (not at 0) so above-the-fold content is never "invisible" while
+     it animates in — a fully transparent hero would delay Largest Contentful Paint. */
   @keyframes rise {
     from {
-      opacity: 0;
-      transform: translateY(14px);
+      opacity: 0.55;
+      transform: translateY(12px);
     }
     to {
       opacity: 1;

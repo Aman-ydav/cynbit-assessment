@@ -10,7 +10,7 @@ import {
 import { Pencil } from "lucide-react";
 import { useNavigate } from "react-router";
 import { Button } from "@/components/ui/button";
-import { seedSaved } from "@/components/wizard/useWizard";
+import { seedSaved } from "@/components/wizard/draft";
 
 const labelOf = <T extends string>(options: readonly { value: T; label: string }[], value: T) =>
   options.find((option) => option.value === value)?.label ?? value;

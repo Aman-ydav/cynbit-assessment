@@ -129,16 +129,20 @@ export function metaTags(origin: string, meta: PageMeta): string {
   return tags.map((tag) => `    ${tag}`).join("\n");
 }
 
-/** Replace the shell's title/description and add the route's tags just before </head>. */
-export function injectMeta(html: string, origin: string, meta: PageMeta): string {
+/**
+ * Replace the shell's title/description and add the route's tags just before </head>.
+ * `extraHead` carries resource hints (preloads) that are built elsewhere and already escaped.
+ */
+export function injectMeta(html: string, origin: string, meta: PageMeta, extraHead = ""): string {
   // A template without a <head> can't be safely rewritten; serve it untouched rather than break it.
   if (!/<\/head>/i.test(html)) return html;
+  const hints = extraHead ? `\n${extraHead}` : "";
   return html
     .replace(/<title>[\s\S]*?<\/title>/i, "")
     .replace(/<meta\s+name="description"[^>]*>\s*/i, "")
     .replace(
       /<\/head>/i,
-      `    <title>${escapeHtml(meta.title)}</title>\n${metaTags(origin, meta)}\n  </head>`,
+      () => `    <title>${escapeHtml(meta.title)}</title>\n${metaTags(origin, meta)}${hints}\n  </head>`,
     );
 }
 
