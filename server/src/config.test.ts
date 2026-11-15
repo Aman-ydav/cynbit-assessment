@@ -51,14 +51,13 @@ describe("loadConfig", () => {
     expect(() => loadConfig({ NODE_ENV: "development", PUBLIC_URL: "not a url" })).toThrow();
   });
 
-  it("only enables email when both the key and sender are set", () => {
+  it("only enables email when the key, sender and public URL are all set", () => {
+    const base = { NODE_ENV: "development", RESEND_API_KEY: "k", EMAIL_FROM: "Path <p@example.com>" };
     expect(loadConfig({ NODE_ENV: "development", RESEND_API_KEY: "k" }).email).toBeUndefined();
-    const config = loadConfig({
-      NODE_ENV: "development",
-      RESEND_API_KEY: "k",
-      EMAIL_FROM: "Path <plans@example.com>",
-    });
-    expect(config.email).toEqual({ apiKey: "k", from: "Path <plans@example.com>" });
+    // No PUBLIC_URL → links in emails could not be trusted, so email stays off.
+    expect(loadConfig(base).email).toBeUndefined();
+    const config = loadConfig({ ...base, PUBLIC_URL: "https://app.example.com" });
+    expect(config.email).toEqual({ apiKey: "k", from: "Path <p@example.com>" });
   });
 
   it("strips a trailing slash from the public URL", () => {

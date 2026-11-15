@@ -13,6 +13,13 @@ export function makeConfig(overrides: Record<string, string> = {}): Config {
   });
 }
 
+/**
+ * Effectively unlimited rate limits, so suites that make many requests from one IP don't trip
+ * the limiter. Rate limiting itself is covered by its own dedicated test file.
+ */
+const BIG = { windowMs: 60_000, limit: 100_000 };
+export const relaxedLimits = { plans: BIG, leads: BIG, events: BIG, adminLogin: BIG, admin: BIG };
+
 /** Connects to the shared in-memory MongoDB and empties every collection before each test. */
 export function useTestDb() {
   beforeAll(async () => {

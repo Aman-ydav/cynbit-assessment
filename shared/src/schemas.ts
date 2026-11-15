@@ -21,6 +21,21 @@ export const answersSchema = z.object({
 
 export type Answers = z.infer<typeof answersSchema>;
 
+/** Random per-tab id generated in the browser; links events together without identifying anyone. */
+export const sessionIdSchema = z
+  .string()
+  .min(8)
+  .max(64)
+  .regex(/^[A-Za-z0-9_-]+$/);
+
+/** Body of POST /api/plans. */
+export const createPlanRequestSchema = z.object({
+  answers: answersSchema,
+  sessionId: sessionIdSchema.optional(),
+});
+
+export type CreatePlanRequest = z.infer<typeof createPlanRequestSchema>;
+
 /** Optional contact details collected only after the learner has seen their plan. */
 export const leadInputSchema = z
   .object({
@@ -36,6 +51,7 @@ export const leadInputSchema = z
     wantsEmail: z.boolean(),
     wantsAdvisor: z.boolean(),
     consent: z.literal(true, { error: "Please agree so we can contact you" }),
+    sessionId: sessionIdSchema.optional(),
     /** Honeypot: real people never see or fill this field. */
     website: z.string().max(0).optional(),
   })
@@ -67,11 +83,7 @@ export type EventName = ClientEventName | ServerEventName;
 const propValue = z.union([z.string().max(60), z.number().finite(), z.boolean()]);
 
 export const eventInputSchema = z.object({
-  sessionId: z
-    .string()
-    .min(8)
-    .max(64)
-    .regex(/^[A-Za-z0-9_-]+$/),
+  sessionId: sessionIdSchema,
   name: z.enum(CLIENT_EVENT_NAMES),
   props: z
     .record(z.string().max(30), propValue)

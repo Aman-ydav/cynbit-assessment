@@ -7,12 +7,12 @@ import { serveClient } from "./client-static";
 import type { Config } from "./config";
 import { log } from "./logger";
 import { apiNotFound, errorHandler } from "./middleware/errors";
-import { apiRouter } from "./routes";
+import { apiRouter, type ApiOptions } from "./routes";
 
 const GA_HOSTS = ["https://www.googletagmanager.com", "https://www.google-analytics.com"];
 
 /** Builds the Express app. Kept separate from `listen()` so tests can drive it with supertest. */
-export function createApp(config: Config): Express {
+export function createApp(config: Config, options: ApiOptions = {}): Express {
   const app = express();
 
   app.disable("x-powered-by");
@@ -65,7 +65,7 @@ export function createApp(config: Config): Express {
     res.setHeader("X-Robots-Tag", "noindex, nofollow");
     next();
   });
-  app.use("/api", apiRouter(config));
+  app.use("/api", apiRouter(config, options));
   app.use("/api", apiNotFound);
 
   serveClient(app, config.clientDist);

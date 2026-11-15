@@ -93,8 +93,11 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
     trustProxy: e.TRUST_PROXY,
     // Both server/src (dev) and server/dist (built) sit two levels below the repo root.
     clientDist: e.CLIENT_DIST ? path.resolve(e.CLIENT_DIST) : path.resolve(here, "../../client/dist"),
+    // Email needs a trusted public URL: links in emails must never be built from the Host header.
     email:
-      e.RESEND_API_KEY && e.EMAIL_FROM ? { apiKey: e.RESEND_API_KEY, from: e.EMAIL_FROM } : undefined,
+      e.RESEND_API_KEY && e.EMAIL_FROM && e.PUBLIC_URL
+        ? { apiKey: e.RESEND_API_KEY, from: e.EMAIL_FROM }
+        : undefined,
     usingDevAdminDefaults: !e.ADMIN_PASSWORD || !e.ADMIN_JWT_SECRET,
   };
 }
