@@ -2,6 +2,7 @@ import { Router } from "express";
 import mongoose from "mongoose";
 import type { Config } from "../config";
 import { DEFAULT_LIMITS, type RateLimits } from "../middleware/rateLimit";
+import { adminRouter } from "./admin";
 import { eventsRouter } from "./events";
 import { leadsRouter } from "./leads";
 import { plansRouter } from "./plans";
@@ -31,6 +32,7 @@ export function apiRouter(config: Config, options: ApiOptions = {}): Router {
   router.use("/plans", plansRouter(limits));
   router.use("/leads", leadsRouter(config, limits));
   router.use("/events", eventsRouter(limits));
+  router.use("/admin", adminRouter(config, limits));
 
   return router;
 }
