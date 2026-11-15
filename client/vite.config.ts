@@ -5,6 +5,8 @@ import { defineConfig } from "vite";
 
 // In development the Vite dev server proxies /api to the Express server,
 // so the browser sees a single origin (no CORS needed).
+const apiTarget = process.env.VITE_API_PROXY ?? "http://localhost:4000";
+
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   resolve: {
@@ -15,7 +17,7 @@ export default defineConfig({
   server: {
     port: 5173,
     proxy: {
-      "/api": "http://localhost:4000",
+      "/api": apiTarget,
     },
   },
   build: {

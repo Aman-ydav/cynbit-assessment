@@ -88,6 +88,15 @@ export function loadSaved(): { draft: Draft; step: number } {
   }
 }
 
+/** Pre-fill the wizard with existing answers (used by "Edit my answers" on the plan page). */
+export function seedSaved(answers: Answers, step = 0) {
+  try {
+    sessionStorage.setItem(STORAGE_KEY, JSON.stringify({ draft: answers, step }));
+  } catch {
+    /* storage may be unavailable; the wizard will simply start empty */
+  }
+}
+
 export function clearSaved() {
   try {
     sessionStorage.removeItem(STORAGE_KEY);
