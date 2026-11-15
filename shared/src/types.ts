@@ -91,3 +91,35 @@ export interface Plan {
   notes: string[];
   enrol: { labId: LabId; priceInr: number; listPriceInr: number };
 }
+
+/* ── Admin dashboard contract (shared by the API and the dashboard UI) ──────── */
+
+export interface FunnelRow {
+  name: string;
+  label: string;
+  sessions: number;
+  /** Share of quiz starters who reached this stage, 0–100. */
+  pctOfStarted: number;
+}
+
+export interface AdminStats {
+  totals: { plans: number; leads: number; sessions: number };
+  funnel: FunnelRow[];
+  steps: { step: number; sessions: number }[];
+  labs: { lab: string; plans: number; avgMatch: number }[];
+  unmatched: { interest: string; plans: number }[];
+  daily: { date: string; plans: number }[];
+  generatedAt: string;
+}
+
+export interface AdminLead {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  lab: string;
+  wantsAdvisor: boolean;
+  wantsEmail: boolean;
+  emailSent: boolean;
+  createdAt: string;
+}

@@ -59,7 +59,7 @@ describe("admin login", () => {
 });
 
 describe("admin session protection", () => {
-  const protectedPaths = ["/api/admin/me", "/api/admin/stats", "/api/admin/leads", "/api/admin/leads.csv"];
+  const protectedPaths = ["/api/admin/stats", "/api/admin/leads", "/api/admin/leads.csv"];
 
   it.each(protectedPaths)("blocks %s without a session", async (path) => {
     expect((await request(app).get(path)).status).toBe(401);
@@ -67,9 +67,26 @@ describe("admin session protection", () => {
 
   it("allows access with a valid session and ends it on logout", async () => {
     const agent = await loggedInAgent();
-    expect((await agent.get("/api/admin/me")).status).toBe(200);
+    expect((await agent.get("/api/admin/stats")).status).toBe(200);
     await agent.post("/api/admin/logout").expect(204);
-    expect((await agent.get("/api/admin/me")).status).toBe(401);
+    expect((await agent.get("/api/admin/stats")).status).toBe(401);
+  });
+
+  it("reports sign-in state through /me without erroring for anonymous visitors", async () => {
+    const anonymous = await request(app).get("/api/admin/me");
+    expect(anonymous.status).toBe(200);
+    // Nothing about the configuration is revealed to someone who is not signed in.
+    expect(anonymous.body).toEqual({ authenticated: false });
+
+    const agent = await loggedInAgent();
+    expect((await agent.get("/api/admin/me")).body).toMatchObject({ authenticated: true });
+    await agent.post("/api/admin/logout").expect(204);
+    expect((await agent.get("/api/admin/me")).body).toEqual({ authenticated: false });
+  });
+
+  it("does not treat a forged cookie as signed in via /me", async () => {
+    const res = await request(app).get("/api/admin/me").set("Cookie", `${ADMIN_COOKIE}=forged`);
+    expect(res.body).toEqual({ authenticated: false });
   });
 
   it.each([

@@ -8,6 +8,7 @@ import Landing from "@/pages/Landing";
 const Wizard = lazy(() => import("@/pages/Wizard"));
 const Plan = lazy(() => import("@/pages/Plan"));
 const Privacy = lazy(() => import("@/pages/Privacy"));
+const Admin = lazy(() => import("@/pages/Admin"));
 const NotFound = lazy(() => import("@/pages/NotFound"));
 
 export default function App() {
@@ -19,6 +20,7 @@ export default function App() {
           <Route path="path" element={<Wizard />} />
           <Route path="plan/:code" element={<Plan />} />
           <Route path="privacy" element={<Privacy />} />
+          <Route path="admin" element={<Admin />} />
           <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>

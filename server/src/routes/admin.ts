@@ -5,6 +5,7 @@ import {
   ADMIN_COOKIE,
   SESSION_HOURS,
   cookieOptions,
+  isValidAdminToken,
   requireAdmin,
   safeEqual,
   signAdminToken,
@@ -54,12 +55,20 @@ export function adminRouter(config: Config, limits: RateLimits): Router {
     res.status(204).end();
   });
 
+  /**
+   * Auth probe for the dashboard. Answers 200 either way so an anonymous visit does not log a
+   * failed request; dev-credential hints are only revealed to an authenticated session.
+   */
+  router.get("/me", (req, res) => {
+    const authenticated = isValidAdminToken(req.cookies?.[ADMIN_COOKIE], config);
+    res.setHeader("Cache-Control", "no-store");
+    res.json(
+      authenticated ? { authenticated, usingDevDefaults: config.usingDevAdminDefaults } : { authenticated },
+    );
+  });
+
   // Everything below needs a valid session, and is rate-limited per IP.
   router.use(createLimiter(limits.admin), guard);
-
-  router.get("/me", (_req, res) => {
-    res.json({ ok: true, usingDevDefaults: config.usingDevAdminDefaults });
-  });
 
   router.get("/stats", async (_req, res) => {
     res.setHeader("Cache-Control", "no-store");

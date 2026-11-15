@@ -1,4 +1,11 @@
-import type { Answers, ClientEventName, LeadInput, Plan } from "@bitelevate/shared";
+import type {
+  AdminLead,
+  AdminStats,
+  Answers,
+  ClientEventName,
+  LeadInput,
+  Plan,
+} from "@bitelevate/shared";
 
 /** A failed API call. `status` 0 means the network itself failed (offline, server down). */
 export class ApiError extends Error {
@@ -66,6 +73,17 @@ export const api = {
     request<LeadResponse>("/leads", { method: "POST", body: JSON.stringify(lead) }),
 
   deleteLead: (token: string) => request<void>(`/leads/${encodeURIComponent(token)}`, { method: "DELETE" }),
+
+  adminLogin: (password: string) =>
+    request<{ ok: true }>("/admin/login", { method: "POST", body: JSON.stringify({ password }) }),
+
+  adminLogout: () => request<void>("/admin/logout", { method: "POST" }),
+
+  adminMe: () => request<{ authenticated: boolean }>("/admin/me"),
+
+  adminStats: () => request<AdminStats>("/admin/stats"),
+
+  adminLeads: () => request<{ leads: AdminLead[] }>("/admin/leads?limit=200"),
 
   sendEvent: (body: { sessionId: string; name: ClientEventName; props?: Record<string, string | number | boolean> }) =>
     request<void>("/events", { method: "POST", body: JSON.stringify(body), keepalive: true }),

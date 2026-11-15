@@ -1,3 +1,4 @@
+import type { AdminStats, FunnelRow } from "@bitelevate/shared";
 import { EventModel } from "../models/Event";
 import { LeadModel } from "../models/Lead";
 import { PlanModel } from "../models/Plan";
@@ -11,24 +12,6 @@ export const FUNNEL_STAGES = [
   { name: "lead_submitted", label: "Asked to be contacted" },
 ] as const;
 
-export interface FunnelRow {
-  name: string;
-  label: string;
-  sessions: number;
-  /** Share of quiz starters who reached this stage, 0–100. */
-  pctOfStarted: number;
-}
-
-export interface Stats {
-  totals: { plans: number; leads: number; sessions: number };
-  funnel: FunnelRow[];
-  steps: { step: number; sessions: number }[];
-  labs: { lab: string; plans: number; avgMatch: number }[];
-  unmatched: { interest: string; plans: number }[];
-  daily: { date: string; plans: number }[];
-  generatedAt: string;
-}
-
 const TZ = "Asia/Kolkata";
 const DAYS = 14;
 
@@ -36,7 +19,7 @@ const DAYS = 14;
 const dayKey = (date: Date) =>
   new Intl.DateTimeFormat("en-CA", { timeZone: TZ }).format(date);
 
-export async function getStats(now = new Date()): Promise<Stats> {
+export async function getStats(now = new Date()): Promise<AdminStats> {
   const since = new Date(now.getTime() - DAYS * 24 * 60 * 60 * 1000);
 
   const [sessionsAgg, stepsAgg, labsAgg, unmatchedAgg, dailyAgg, plans, leads] = await Promise.all([
