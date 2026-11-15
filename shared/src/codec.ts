@@ -23,6 +23,14 @@ const fromBase64Url = (code: string) => {
   return atob(base64 + "=".repeat((4 - (base64.length % 4)) % 4));
 };
 
+/**
+ * Strict index lookup. Plain `list[index]` would also accept numeric strings ("0") and other
+ * coercible keys, letting two different codes decode to the same answers.
+ */
+function lookup<T>(list: readonly T[], index: unknown): T | undefined {
+  return typeof index === "number" && Number.isInteger(index) ? list[index] : undefined;
+}
+
 export function encodeAnswers(answers: Answers): string {
   const tuple = [
     CODEC_VERSION,
@@ -50,15 +58,15 @@ export function decodeAnswers(code: string): Answers | null {
     if (interests.length > MAX_INTERESTS || skills.length > SKILL_IDS.length) return null;
     if (exams !== 0 && exams !== 1) return null;
 
-    // Enum lookups yield `undefined` for bad indices, which the schema then rejects.
+    // Lookups yield `undefined` for bad indices, which the schema then rejects.
     const parsed = answersSchema.safeParse({
-      stage: STAGES[stage],
-      experience: EXPERIENCE_LEVELS[experience],
-      goal: GOALS[goal],
-      interests: interests.map((index) => INTEREST_IDS[index]),
-      hoursPerDay: DAILY_HOURS[hours],
+      stage: lookup(STAGES, stage),
+      experience: lookup(EXPERIENCE_LEVELS, experience),
+      goal: lookup(GOALS, goal),
+      interests: interests.map((index) => lookup(INTEREST_IDS, index)),
+      hoursPerDay: lookup(DAILY_HOURS, hours),
       examsSoon: exams === 1,
-      skills: skills.map((index) => SKILL_IDS[index]),
+      skills: skills.map((index) => lookup(SKILL_IDS, index)),
     });
     return parsed.success ? parsed.data : null;
   } catch {
