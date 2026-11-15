@@ -1,1 +1,216 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@import "@fontsource-variable/plus-jakarta-sans";
+@import "@fontsource-variable/manrope";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * Design tokens.
+ * Palette is derived from the public Cynbit identity (teal #006067 + amber accent) and mapped
+ * onto shadcn/ui's semantic variables, so every shadcn component inherits the brand.
+ * Muted text is kept at >= 4.5:1 contrast and labels never go below 12px (accessibility).
+ */
+:root {
+  --radius: 0.875rem;
+
+  --background: #f7fafa;
+  --foreground: #181c1d;
+  --card: #ffffff;
+  --card-foreground: #181c1d;
+  --popover: #ffffff;
+  --popover-foreground: #181c1d;
+
+  --primary: #006067;
+  --primary-foreground: #ffffff;
+  --secondary: #e4f1f2;
+  --secondary-foreground: #0b3f43;
+  --muted: #f0f4f4;
+  --muted-foreground: #4a5758;
+  --accent: #dff1f3;
+  --accent-foreground: #00474c;
+  --destructive: #b3261e;
+
+  --border: #d6e0e0;
+  --input: #c3d0d1;
+  --ring: #007b83;
+
+  --chart-1: #006067;
+  --chart-2: #007b83;
+  --chart-3: #5cc3cc;
+  --chart-4: #986400;
+  --chart-5: #12629d;
+
+  /* Brand extras (not part of the shadcn contract) */
+  --brand-ink: #0b1f24;
+  --brand-soft: #e4f1f2;
+  --brand-glow: #96f1fa;
+  --amber: #8a5a00;
+  --amber-soft: #fff1d6;
+  --success: #1b6e46;
+  --success-soft: #e0f3ea;
+  --warning-soft: #fff4dc;
+}
+
+@theme inline {
+  --font-heading: "Plus Jakarta Sans Variable", "Plus Jakarta Sans", ui-sans-serif, system-ui,
+    sans-serif;
+  --font-sans: "Manrope Variable", "Manrope", ui-sans-serif, system-ui, sans-serif;
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+
+  --color-brand-ink: var(--brand-ink);
+  --color-brand-soft: var(--brand-soft);
+  --color-brand-glow: var(--brand-glow);
+  --color-amber: var(--amber);
+  --color-amber-soft: var(--amber-soft);
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-warning-soft: var(--warning-soft);
+
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+
+  --shadow-soft: 0 1px 2px rgb(11 31 36 / 0.04), 0 8px 24px -8px rgb(11 31 36 / 0.1);
+  --shadow-lift: 0 2px 4px rgb(11 31 36 / 0.05), 0 20px 40px -16px rgb(0 96 103 / 0.25);
+
+  --animate-rise: rise 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+  --animate-fade: fade 0.35s ease-out both;
+
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(14px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  @keyframes fade {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  html {
+    @apply font-sans;
+    scroll-behavior: smooth;
+    scroll-padding-top: 5.5rem;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-size: 1rem;
+    line-height: 1.65;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-heading);
+    letter-spacing: -0.022em;
+    line-height: 1.12;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  :focus-visible {
+    outline: 3px solid var(--ring);
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
+
+  ::selection {
+    background: var(--brand-glow);
+    color: var(--brand-ink);
+  }
+}
+
+@layer utilities {
+  .shadow-soft {
+    box-shadow: var(--shadow-soft);
+  }
+  .shadow-lift {
+    box-shadow: var(--shadow-lift);
+  }
+  /* Soft brand glow used behind hero content */
+  .hero-glow {
+    background:
+      radial-gradient(60rem 28rem at 85% -10%, rgb(150 241 250 / 0.55), transparent 60%),
+      radial-gradient(44rem 24rem at -10% 10%, rgb(0 96 103 / 0.1), transparent 60%),
+      var(--background);
+  }
+  .grid-fade {
+    background-image:
+      linear-gradient(to right, rgb(0 96 103 / 0.06) 1px, transparent 1px),
+      linear-gradient(to bottom, rgb(0 96 103 / 0.06) 1px, transparent 1px);
+    background-size: 44px 44px;
+    mask-image: radial-gradient(ellipse at 50% 0%, black 30%, transparent 75%);
+  }
+}
+
+/* Respect users who ask for less motion. */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  body {
+    background: #fff;
+  }
+}
