@@ -1,0 +1,28 @@
+# ── Private working notes, research & evidence — NEVER publish ──
+research/
+docs-private/
+
+# ── Dependencies / build output ──
+node_modules/
+.next/
+out/
+dist/
+coverage/
+*.tsbuildinfo
+next-env.d.ts
+
+# ── Env & secrets ──
+.env
+.env.*
+!.env.example
+
+# ── Tooling / OS ──
+.vercel/
+.turbo/
+*.log
+npm-debug.log*
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
