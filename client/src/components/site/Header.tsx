@@ -1,4 +1,5 @@
 import { ArrowRight, Menu } from "lucide-react";
+import { useRef } from "react";
 import { Link, useLocation } from "react-router";
 import { Logo } from "@/components/site/Logo";
 import { NAV_LINKS } from "@/components/site/nav";
@@ -14,6 +15,15 @@ import {
 } from "@/components/ui/sheet";
 
 function MarketingNav() {
+  // When a menu link is used, the learner is leaving the menu for a page section. Radix would then
+  // move focus back to the menu button, and that focus() call cancels the smooth scroll to the
+  // section. So skip the focus return after a navigation (it still happens when the menu is
+  // simply dismissed), and let ScrollManager move focus to the destination instead.
+  const navigated = useRef(false);
+  const markNavigated = () => {
+    navigated.current = true;
+  };
+
   return (
     <>
       <nav aria-label="Primary" className="hidden items-center gap-1 md:flex">
@@ -41,7 +51,16 @@ function MarketingNav() {
               <Menu />
             </Button>
           </SheetTrigger>
-          <SheetContent side="right" className="w-[min(88vw,22rem)]">
+          <SheetContent
+            side="right"
+            className="w-[min(88vw,22rem)]"
+            onCloseAutoFocus={(event) => {
+              if (navigated.current) {
+                event.preventDefault();
+                navigated.current = false;
+              }
+            }}
+          >
             <SheetHeader>
               <SheetTitle>Menu</SheetTitle>
               <SheetDescription>Jump to a section or start your plan.</SheetDescription>
@@ -49,7 +68,11 @@ function MarketingNav() {
             <nav aria-label="Mobile" className="flex flex-col gap-1 px-4">
               {NAV_LINKS.map((link) => (
                 <SheetClose asChild key={link.to}>
-                  <Link to={link.to} className="hover:bg-muted rounded-xl px-3 py-3 text-base font-semibold">
+                  <Link
+                    to={link.to}
+                    onClick={markNavigated}
+                    className="hover:bg-muted rounded-xl px-3 py-3 text-base font-semibold"
+                  >
                     {link.label}
                   </Link>
                 </SheetClose>
@@ -57,6 +80,7 @@ function MarketingNav() {
               <SheetClose asChild>
                 <Link
                   to="/privacy"
+                  onClick={markNavigated}
                   className="hover:bg-muted text-muted-foreground rounded-xl px-3 py-3 text-base font-semibold"
                 >
                   Privacy
@@ -66,7 +90,7 @@ function MarketingNav() {
             <div className="mt-auto p-4">
               <SheetClose asChild>
                 <Button asChild size="xl" className="w-full">
-                  <Link to="/path">
+                  <Link to="/path" onClick={markNavigated}>
                     Build my plan <ArrowRight data-icon="inline-end" />
                   </Link>
                 </Button>

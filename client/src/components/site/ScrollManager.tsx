@@ -2,9 +2,13 @@ import { useEffect, useRef } from "react";
 import { useLocation } from "react-router";
 import { trackPageView } from "@/lib/analytics";
 
+/** Radix (react-remove-scroll) marks <body> with this while a modal such as the menu is open. */
+const isScrollLocked = () => document.body.hasAttribute("data-scroll-locked");
+
 /**
  * Single-page apps don't scroll or move focus on navigation by default.
- * - Hash links (/#labs) scroll to the target section.
+ * - Hash links (/#labs) scroll to the target section — including from the mobile menu, which
+ *   locks body scrolling while it closes, so we wait for the lock to release first.
  * - Route changes reset scroll and move focus to <main> so screen-reader and keyboard
  *   users land at the top of the new page.
  */
@@ -23,8 +27,23 @@ export function ScrollManager() {
     if (hash) {
       const target = document.getElementById(decodeURIComponent(hash.slice(1)));
       if (target) {
-        target.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "start" });
-        return;
+        const scroll = () =>
+          target.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "start" });
+
+        if (!isScrollLocked()) {
+          scroll();
+          return;
+        }
+        // Wait (briefly) for the closing modal to release the scroll lock, then scroll.
+        let waited = 0;
+        const timer = window.setInterval(() => {
+          waited += 50;
+          if (!isScrollLocked() || waited >= 1500) {
+            window.clearInterval(timer);
+            scroll();
+          }
+        }, 50);
+        return () => window.clearInterval(timer);
       }
     }
 

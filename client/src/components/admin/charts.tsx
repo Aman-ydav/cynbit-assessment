@@ -126,7 +126,7 @@ export function ColumnChart({
 
   return (
     <figure>
-      <div role="img" aria-label={ariaLabel} className="relative h-44 pl-9">
+      <div role="group" aria-label={ariaLabel} className="relative h-44 pl-9">
         {/* recessive grid */}
         {ticks.map((tick) => (
           <div
@@ -140,12 +140,13 @@ export function ColumnChart({
           </div>
         ))}
 
-        <div className="absolute inset-y-0 right-0 left-9 flex items-end gap-1">
+        <div role="list" className="absolute inset-y-0 right-0 left-9 flex items-end gap-1">
           {data.map((d, index) => {
             const showValue = d.value > 0 && (d.value === peak || index === data.length - 1);
             return (
               <div
                 key={d.key}
+                role="listitem"
                 tabIndex={0}
                 aria-label={`${d.label}: ${d.value}`}
                 className="group relative flex h-full flex-1 items-end rounded-sm outline-offset-2"

@@ -27,7 +27,8 @@ export function Logo({ className }: { className?: string }) {
   return (
     <Link
       to="/"
-      aria-label="BitElevate Path Generator, home"
+      // No aria-label: the visible text ("Path Generator for BitElevate") is the accessible name,
+      // which satisfies WCAG 2.5.3 (Label in Name) by construction.
       className={cn("group inline-flex items-center gap-2.5", className)}
     >
       <LogoMark className="transition-transform duration-300 group-hover:-rotate-6" />

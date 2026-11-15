@@ -16,7 +16,7 @@
     "build": "npm run build -w client && npm run build -w server",
     "start": "npm run start -w server",
     "lint": "eslint .",
-    "typecheck": "npm run typecheck --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present && tsc -p e2e --noEmit",
     "test": "npm run test --workspaces --if-present",
     "e2e": "playwright test",
     "format": "prettier --write ."
