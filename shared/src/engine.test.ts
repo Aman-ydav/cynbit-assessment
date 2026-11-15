@@ -61,11 +61,16 @@ describe("golden learner profiles", () => {
     expect(plan.readiness.optionalGaps.length).toBeGreaterThan(0);
   });
 
-  it("QA-minded learner → QA & Automation", () => {
+  it("QA-minded learner → QA & Automation, with a short prep for the one missing skill", () => {
     const plan = generatePlan(
-      answers({ interests: ["qa_testing"], skills: ["git", "python", "testing_basics"] }),
+      answers({ interests: ["qa_testing"], skills: ["git", "python", "web_basics"] }),
     );
     expect(plan.primary.labId).toBe("qa_automation");
+    expect(plan.readiness.gaps.map((g) => g.skill)).toEqual(["testing_basics"]);
+    // A high score with a gap is "short prep", not "ready" — the headline must match the timeline.
+    expect(plan.readiness.score).toBeGreaterThanOrEqual(75);
+    expect(plan.readiness.band).toBe("short_prep");
+    expect(plan.timeline[0]?.id).toBe("prep");
   });
 
   it("full-stack ready learner → Full Stack with a very strong match", () => {
@@ -215,6 +220,9 @@ describe("invariants over 800 random learners", () => {
     for (const plan of plans) {
       expect(plan.readiness.score).toBeGreaterThanOrEqual(0);
       expect(plan.readiness.score).toBeLessThanOrEqual(100);
+      // "Ready" if and only if no core skill is missing (so it never contradicts a prep sprint).
+      expect(plan.readiness.band === "ready").toBe(plan.readiness.gaps.length === 0);
+      if (plan.readiness.gaps.length === 0) expect(plan.readiness.score).toBe(100);
       const { schedule } = plan;
       expect(schedule.prepDays).toBeGreaterThanOrEqual(0);
       expect(schedule.prepDays).toBeLessThanOrEqual(28);

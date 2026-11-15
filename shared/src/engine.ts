@@ -92,7 +92,10 @@ export function computeReadiness(lab: Lab, skills: readonly SkillId[]): Readines
     .sort(byPriority)
     .map(toGap);
 
-  const band: ReadinessBand = score >= 75 ? "ready" : score >= 45 ? "short_prep" : "prep_first";
+  // "Ready" means nothing core is missing — otherwise the timeline would show a prep sprint
+  // right under a headline saying the learner can simply start.
+  const band: ReadinessBand =
+    gaps.length === 0 ? "ready" : score >= 50 ? "short_prep" : "prep_first";
   const headline = {
     ready: "You can start Day 1 with confidence",
     short_prep: "A short prep sprint will get you ready",
