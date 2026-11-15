@@ -6,7 +6,7 @@ Built as an improvement proposal for Cynbit Technologies · MongoDB · Express �
 
 | | |
 |---|---|
-| 🔗 **Live demo** | `<<add the deployed URL after deploying>>` |
+| 🔗 **Live demo** | https://cynbit-assessment.onrender.com |
 | 📦 **Source** | this repository — a clean, incremental commit history |
 | ✅ **Quality** | 231 automated tests · Lighthouse mobile 93–98 · axe WCAG 2.2 AA clean |
 | ℹ️ **Status** | A prototype built for an assessment. Not an official Cynbit product. |
