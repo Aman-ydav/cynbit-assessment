@@ -59,7 +59,10 @@ describe("serving the built client", () => {
   beforeAll(() => {
     dist = fs.mkdtempSync(path.join(os.tmpdir(), "client-dist-"));
     fs.mkdirSync(path.join(dist, "assets"));
-    fs.writeFileSync(path.join(dist, "index.html"), "<!doctype html><title>shell</title>");
+    fs.writeFileSync(
+      path.join(dist, "index.html"),
+      "<!doctype html><html><head><title>shell</title></head><body><div id=\"root\"></div></body></html>",
+    );
     fs.writeFileSync(path.join(dist, "assets", "app-abc123.js"), "console.log(1)");
   });
 
@@ -68,9 +71,9 @@ describe("serving the built client", () => {
   const appWithClient = () => createApp(makeConfig({ CLIENT_DIST: dist }));
 
   it("falls back to index.html for client-side routes", async () => {
-    const res = await request(appWithClient()).get("/plan/abc123");
+    const res = await request(appWithClient()).get("/path");
     expect(res.status).toBe(200);
-    expect(res.text).toContain("<title>shell</title>");
+    expect(res.text).toContain('<div id="root">');
     expect(res.headers["cache-control"]).toBe("no-cache");
   });
 

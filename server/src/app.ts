@@ -8,6 +8,7 @@ import type { Config } from "./config";
 import { log } from "./logger";
 import { apiNotFound, errorHandler } from "./middleware/errors";
 import { apiRouter, type ApiOptions } from "./routes";
+import { resolveOrigin, seoRouter } from "./seo";
 
 const GA_HOSTS = ["https://www.googletagmanager.com", "https://www.google-analytics.com"];
 
@@ -68,7 +69,8 @@ export function createApp(config: Config, options: ApiOptions = {}): Express {
   app.use("/api", apiRouter(config, options));
   app.use("/api", apiNotFound);
 
-  serveClient(app, config.clientDist);
+  app.use(seoRouter(config));
+  serveClient(app, config.clientDist, (req) => resolveOrigin(config, req));
 
   app.use(errorHandler);
   return app;
