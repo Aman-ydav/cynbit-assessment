@@ -296,12 +296,3 @@ cynbit.in is a Next.js app and this prototype is MERN, so it is **portable, not 
 
 AI assistants (Claude Code) were used as a **coding and research assistant** under my direction — for scaffolding, boilerplate, scripts and review.
 
-## Repository layout
-
-```
-shared/   engine, config, schemas, plan codec (+ unit tests)
-server/   Express app, Mongoose models, routes, SEO/preload, API tests
-client/   React app, shadcn/ui components, pages
-e2e/      Playwright end-to-end and accessibility tests
-docs/     README screenshots
-```
