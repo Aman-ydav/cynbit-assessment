@@ -1,11 +1,27 @@
+import { AboutPrototype } from "@/components/landing/AboutPrototype";
+import { Faq } from "@/components/landing/Faq";
+import { Features } from "@/components/landing/Features";
+import { FinalCta } from "@/components/landing/FinalCta";
+import { Hero } from "@/components/landing/Hero";
+import { HonestBand } from "@/components/landing/HonestBand";
+import { HowItWorks } from "@/components/landing/HowItWorks";
+import { LabsGrid } from "@/components/landing/LabsGrid";
+import { StickyCta } from "@/components/landing/StickyCta";
 import { usePageTitle } from "@/hooks/usePageTitle";
 
-// Placeholder — the full landing page lands in its own commit.
 export default function Landing() {
   usePageTitle();
   return (
-    <section className="hero-glow mx-auto max-w-6xl px-4 py-24 sm:px-6">
-      <h1 className="text-4xl font-extrabold sm:text-6xl">Your personalised 60-day plan</h1>
-    </section>
+    <>
+      <Hero />
+      <HowItWorks />
+      <LabsGrid />
+      <Features />
+      <HonestBand />
+      <Faq />
+      <AboutPrototype />
+      <FinalCta />
+      <StickyCta />
+    </>
   );
 }
